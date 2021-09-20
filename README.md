@@ -57,6 +57,22 @@ val knetCronet = Knet.Build(cronet)
 
 Full version:
 ```kotlin
+CronetLogger.global(
+    object : CronetHttpLogger {
+        override fun error(vararg obj: Any) {
+            Log.e("Logos", obj.toList().toString())
+        }
+
+        override fun debug(type: CronetHttpLogger.DebugType, vararg obj: Any) {
+            Log.d("[${type.name}]", obj.toList().toString())
+        }
+
+        override fun info(vararg obj: Any) {
+            Log.i("Logos", obj.toList().toString())
+        }
+    }
+)
+
 private val cronet = CronetKnetEngine.Build(App.context) {
     client {
         setCache(CronetCache.Disk(App.context.filesDir, 1024 * 1024 * 10))
@@ -87,22 +103,6 @@ private val cronet = CronetKnetEngine.Build(App.context) {
 
         followRedirects(true)
         followSslRedirects(true)
-
-        logger(
-            object : CronetHttpLogger {
-                override fun error(vararg obj: Any) {
-                    Log.e("Logos", obj.toList().toString())
-                }
-
-                override fun debug(type: CronetHttpLogger.DebugType, vararg obj: Any) {
-                    Log.d("[${type.name}]", obj.toList().toString())
-                }
-
-                override fun info(vararg obj: Any) {
-                    Log.i("Logos", obj.toList().toString())
-                }
-            }
-        )
 
         addMetricListener { metric: HttpMetrics, _, _ ->
             Metrics.addMetric(metric)
