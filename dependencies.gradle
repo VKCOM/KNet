@@ -87,7 +87,6 @@ class Dependencies {
         project.dependencies {
             implementation project.project(':knet:core')
             implementation project.project(':knet:cronet')
-            implementation project.project(":knet:okhttp")
             implementation okhttp
         }
     }
