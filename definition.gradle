@@ -23,8 +23,8 @@
  */
 
 def defineLib(Project project, String name) {
-    def knetVersionCode = 1
-    def knetVersion = "1.0-alpha01"
+    def knetVersionCode = 2
+    def knetVersion = "1.0-alpha02"
     def knetPackage = "com.vk.knet"
 
     project.apply plugin: "com.android.library"
