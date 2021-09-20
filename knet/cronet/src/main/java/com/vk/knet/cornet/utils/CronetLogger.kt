@@ -25,7 +25,7 @@ package com.vk.knet.cornet.utils
 
 import com.vk.knet.cornet.CronetHttpLogger
 
-internal object CronetLogger {
+object CronetLogger {
 
     @Volatile
     private var logger: CronetHttpLogger? = null

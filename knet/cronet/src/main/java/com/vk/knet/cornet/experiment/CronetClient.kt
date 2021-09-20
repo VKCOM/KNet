@@ -327,7 +327,6 @@ class CronetClient(
         private var cache: CronetCache = CronetCache.Empty
 
         private var netlog: CronetLog.Config = CronetLog.Config(File("${context.filesDir}/cronet_netlog"), FILE_SIZE)
-        private var logger: CronetHttpLogger = CronetHttpLogger.Empty
         private var nativePool: CronetNativeByteBufferPool? = null
         private var arrayPool: ByteArrayPool? = null
 
@@ -428,11 +427,6 @@ class CronetClient(
             netlog = options
         }
 
-        fun logger(logger: CronetHttpLogger) = apply {
-            this.logger = logger
-        }
-
-
         // Stat
         fun addMetricListener(metric: HttpMetricsListener) = apply {
             metrics.add(metric)
@@ -492,8 +486,6 @@ class CronetClient(
         private fun cronetEngine(config: CronetCoreConfig): ExperimentalCronetEngine {
             return CronetEngineBuilder(context)
                 .run {
-                    CronetLogger.global(logger) // TODO: Move to another place
-
                     if (config.isClearHosts) {
                         withClearBroken(true)
                     }

@@ -72,13 +72,8 @@ internal class ConditionLock(
      */
     fun await(value: Boolean) {
         lock.withLock {
-            var i = 0
             while (this.value != value) {
-                if (i > 0) {
-                    CronetLogger.error("ALARM ALARM ALARM ALARM ALARM ALARM ALARM!")
-                }
-                condition.await(10000, TimeUnit.MILLISECONDS)
-                i++
+                condition.await()
             }
         }
     }
