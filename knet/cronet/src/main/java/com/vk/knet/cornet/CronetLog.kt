@@ -65,9 +65,10 @@ class CronetLog(
     private var isStarted = false
     private val lock = Object()
 
-    @get:Synchronized
     override val isRunning: Boolean get() {
-        return isStarted
+        synchronized(lock) {
+            return isStarted
+        }
     }
 
     override val path = config.path
