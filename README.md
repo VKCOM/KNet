@@ -6,6 +6,7 @@ You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abs
 
 ### Order:
 - [Wrapper improovements](#impr)
+- [Gradle](#gradle)
 - [Initialization](#init)
 - [OkHttp Integration](#okhttp)
 - [Comming Soon](#soon)
@@ -29,6 +30,16 @@ You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abs
 - **(soon)** Integrations(ExoPlayer/Ktor/Okhttp/Flipper/Stetho)
 - **(soon)** Backoff
 - **(soon)** DNS Prefetch
+
+## <a name="gradle"></a> Gradle
+You can try this library using Gradle:
+``` groovy
+dependencies {
+ implementation 'com.vk.knet:core:1.0.0-alpha1'
+ implementation 'com.vk.knet:cronet:1.0.0-alpha1'
+ implementation 'com.vk.knet:okcronet:1.0.0-alpha1'
+}
+```
 
 ## <a name="init"></a> Initialization
 Short version:
