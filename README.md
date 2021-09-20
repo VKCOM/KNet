@@ -11,9 +11,9 @@ You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abs
 - [Comming Soon](#soon)
 - [Licence](#lic)
 
-## <a name="impr"></a> Cronet wrapper improovements:
+## <a name="impr"></a> Cronet wrapper improvements:
 - Memory Optimizations
-- Multithread Optimizations
+- Multithreading Optimizations
 - Redirects Settings
 - Quic Configurations
 - Timeouts Settings
@@ -22,18 +22,18 @@ You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abs
 - Interceptor System
 - Debug System
 - Metrics
-- Error Hundling
+- Error Handling
 - **(soon)** Fallback System
-- **(soon)** Encondings
+- **(soon)** Encodings
 - **(soon)** Tests
 - **(soon)** Integrations(ExoPlayer/Ktor/Okhttp/Flipper/Stetho)
-- **(soon)** Backoffs
+- **(soon)** Backoff
 - **(soon)** DNS Prefetch
 
 ## <a name="init"></a> Initialization
 Short version:
 ```kotlin
-val cronet1 = CronetKnetEngine.Build(App.context) {
+val cronet = CronetKnetEngine.Build(App.context) {
     client {
         enableQuic(
             CronetQuic(hints = listOf(Host("drive.google.com", 443)))
@@ -71,7 +71,7 @@ private val cronet = CronetKnetEngine.Build(App.context) {
         nativePool(CronetNativeByteBufferPool.DEFAULT)
         arrayPool(ByteArrayPool.DEFAULT)
 
-        maxConcurrentRequests(MAX_REQUESTS)
+        maxConcurrentRequests(50)
         maxConcurrentRequestsPerHost(10)
 
         followRedirects(true)
@@ -119,7 +119,7 @@ val knetCronet = Knet.Build(cronet) {
 ```
 
 ## <a name="okhttp"></a> OkHTTP
-If you're now using OkHTTP, you can simply wrap KNet into OkHttp Interceptor... Easy, right?
+If you're now using OkHttp, you can simply wrap KNet into OkHttp Interceptor... Easy, right?
 
 ```kotlin
 val knetCronet = Knet.Build(cronet)
