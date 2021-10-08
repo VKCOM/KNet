@@ -23,7 +23,6 @@
 */
 package com.vk.knet.cornet.experiment
 
-import android.util.Log
 import com.vk.knet.core.http.HttpRequest
 import com.vk.knet.core.utils.AnyThread
 import com.vk.knet.core.utils.WorkerThread
@@ -411,7 +410,7 @@ class RequestController(
         @CronetThread
         override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo?) {
             CronetLogger.debug(CronetHttpLogger.DebugType.CLIENT_CALLBACK, "[cronet] Request callback of ${httpRequest.url} succeeded!")
-            Log.d("Bare", "onSucceeded ${info!!.url} | ${info.httpStatusCode} | ${info.allHeaders}")
+            CronetLogger.debug(CronetHttpLogger.DebugType.CLIENT_CALLBACK, "onSucceeded ${info?.url} | ${info?.httpStatusCode} | ${info?.allHeaders}")
 
             updateState(Event.SUCCESS)
         }
