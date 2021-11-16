@@ -23,7 +23,6 @@
 */
 package com.vk.knet.core.http
 
-import java.util.*
 import kotlin.collections.HashMap
 
 enum class HttpMethod(
@@ -34,6 +33,7 @@ enum class HttpMethod(
     HEAD("HEAD"),
     POST("POST"),
     PUT("PUT"),
+    PATCH("PATCH"),
     DELETE("DELETE"),
     CONNECT("CONNECT"),
     OPTIONS("OPTIONS"),
@@ -56,6 +56,7 @@ enum class HttpMethod(
                 put(CONNECT.methodName, CONNECT)
                 put(OPTIONS.methodName, OPTIONS)
                 put(TRACE.methodName, TRACE)
+                put(PATCH.methodName, PATCH)
             }
 
         fun from(name: String): HttpMethod? {
