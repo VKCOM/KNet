@@ -212,7 +212,6 @@ class CronetClient(
                     }
 
                     override fun onClosed() {
-                        arcBuffer.release()
                         cronetController.closeConnection()
                     }
 
@@ -511,7 +510,7 @@ class CronetClient(
 
         object Default {
             const val TIMEOUT = 30_000L
-            const val FILE_SIZE = 100 * 1024 * 1024 // 100 MB
+            const val FILE_SIZE = 10 * 1024 * 1024 // 10 MB
             const val IS_REDIRECT = true
 
             const val MAX_REQUEST = 64

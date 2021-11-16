@@ -78,6 +78,7 @@ internal fun UrlRequest.Builder.addHeaders(headers: Map<String, List<String>>): 
  */
 internal fun RequestFinishedInfo.toHttpMetrics(
     requestInitTime: Long,
+    requestInitTimestamp: Long,
     response: HttpResponseMeta?
 ): HttpMetrics {
     val total = metrics.totalTimeMs ?: 0
@@ -105,7 +106,8 @@ internal fun RequestFinishedInfo.toHttpMetrics(
         isFailed = finishedReason == RequestFinishedInfo.FAILED,
         failReason = exception?.message,
         requestStartTime = requestInitTime,
-        protocol = response?.protocol
+        protocol = response?.protocol,
+        requestStartupTimestamp = requestInitTimestamp
     )
 }
 

@@ -26,6 +26,7 @@ package com.vk.knet.cornet.utils
 import com.vk.knet.core.utils.GuardedBy
 import java.io.InputStream
 import java.nio.ByteBuffer
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
@@ -80,6 +81,7 @@ internal class BodyInputStream(
     }
 
     private val lock = ReentrantLock()
+    private val isClosed = AtomicBoolean(false)
 
     @Volatile
     @GuardedBy("lock")
@@ -111,6 +113,17 @@ internal class BodyInputStream(
     private inline fun bufferQueueReader(readFun: (ByteBuffer) -> Int): Int {
         lock.withLock {
             while (true) {
+                // Новых буферов не предвидится, так как сервер уже вернул все данные.
+                // В таком случае, просто возвращаем -1.
+                if (bufferState >= BUFFER_STATE_FINISHED) {
+                    return -1
+                }
+
+                if (isClosed.get()) {
+                    bufferState = BUFFER_STATE_CLOSED
+                    return -1
+                }
+
                 // Буфер пока не готов (либо мы уже вычитали весь старый). Запрашиваем новые данные
                 if (bufferState == BUFFER_STATE_AWAIT) {
                     buffer = delegate.onRead()
@@ -131,12 +144,6 @@ internal class BodyInputStream(
                         continue
                     }
                     return read
-                }
-
-                // Новых буферов не предвидится, так как сервер уже вернул все данные.
-                // В таком случае, просто возвращаем -1.
-                if (bufferState >= BUFFER_STATE_FINISHED) {
-                    return -1
                 }
             }
         }
@@ -173,16 +180,7 @@ internal class BodyInputStream(
     }
 
     override fun close() {
-        if (bufferState >= BUFFER_STATE_CLOSED) {
-            return
-        }
-
-        lock.withLock {
-            if (bufferState >= BUFFER_STATE_CLOSED) {
-                return
-            }
-
-            bufferState = BUFFER_STATE_CLOSED
+        if (isClosed.compareAndSet(false, true)) {
             super.close()
             delegate.onClosed()
         }

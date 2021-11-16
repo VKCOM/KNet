@@ -27,6 +27,8 @@ import com.vk.knet.core.utils.GuardedBy
 import com.vk.knet.core.utils.WorkerThread
 import org.chromium.net.ExperimentalCronetEngine
 import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -86,12 +88,15 @@ class CronetLog(
                 return false
             }
 
-            val netlogDir = File("${config.path.absolutePath}/net_log")
+            val format = SimpleDateFormat("dd-MMM-yyyy_HH-mm-ss", Locale.US)
+            val label = format.format(Date(System.currentTimeMillis()))
+
+            val netlogDir = File("${config.path.absolutePath}/net_log_$label")
             if (!netlogDir.exists()) {
                 netlogDir.deleteRecursively()
             }
             netlogDir.mkdirs()
-            engine.startNetLogToDisk(netlogDir.absolutePath, true, config.maxSize)
+            engine.startNetLogToDisk(netlogDir.absolutePath, false, config.maxSize)
             isStarted = true
             return isStarted
         }

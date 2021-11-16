@@ -52,8 +52,9 @@ class CronetConnectionBuilder(
         callback: UrlRequest.Callback,
         provider: UploadDataProvider?
     ): UrlRequest {
-        //тк все метрики внутри cornet в абсолютных значениях времени прописываем свое
+        // тк все метрики внутри cornet в абсолютных значениях времени прописываем свое
         val requestInitTime = SystemClock.elapsedRealtime()
+        val requestInitTimestamp = System.currentTimeMillis()
 
         // Callback, вызываемый когда запрос заканчивает свою работу (неважно по какой причине)
         val requestCompleteHandler = object : RequestFinishedInfo.Listener(executorMetric) {
@@ -62,7 +63,7 @@ class CronetConnectionBuilder(
                 if (metric != null) {
                     val info = requestInfo.responseInfo
                     if (info == null) {
-                        val metrics = requestInfo.toHttpMetrics(requestInitTime, null)
+                        val metrics = requestInfo.toHttpMetrics(requestInitTime, requestInitTimestamp, null)
                         metric.onMetricsCollected(metrics, request, null)
                         return
                     }
@@ -80,7 +81,7 @@ class CronetConnectionBuilder(
                         headers
                     )
 
-                    val metrics = requestInfo.toHttpMetrics(requestInitTime, data)
+                    val metrics = requestInfo.toHttpMetrics(requestInitTime, requestInitTimestamp, data)
                     metric.onMetricsCollected(metrics, request, data)
                 }
             }

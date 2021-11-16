@@ -33,6 +33,7 @@ data class HttpMetrics(
     val proxy: String,
     val intervals: HttpMetricIntervals,
     val totalTimeMs: Long,
+    val requestStartupTimestamp: Long,
     val requestStartTime: Long,
     val isFailed: Boolean,
     val protocol: HttpProtocol?,
