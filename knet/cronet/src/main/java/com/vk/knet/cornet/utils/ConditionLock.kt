@@ -30,9 +30,9 @@ import java.util.concurrent.locks.Lock
 import kotlin.concurrent.withLock
 
 /**
- * Простая обертка для ожидания изменения [value] с возможностью сброса (обновления) таймаута.
- * Необходим для работы с таймаутами запросов:
- * каждый раз когда какой-то чанк данных отправляется или читается - мы перезапускаем таймаут.
+ * Simple wrapper for waiting for [value] changes with the ability to reset (update) the timeout.
+ * Required to work with request timeouts:
+ * every time when some chunk of data is sent or read - we restart the timeout.
  */
 @Suppress("MemberVisibilityCanBePrivate")
 internal class ConditionLock(
@@ -47,7 +47,7 @@ internal class ConditionLock(
     private val condition = lock.newCondition()
 
     /**
-     * Смена значения [ConditionLock.value] на [value]
+     * Changing [ConditionLock.value] to [value]
      */
     fun change(value: Boolean) {
         lock.withLock {
@@ -57,8 +57,8 @@ internal class ConditionLock(
     }
 
     /**
-     * Рестарт ранее запущенных [await] с обновленным таймаутом.
-     * Т.е. новые threshold по времени изменится на now() + timeout
+     * Restart previously started [await] with updated timeout.
+     * Ie new thresholds in time will change to now () + timeout
      */
     fun restartAwaitTimeouts() {
         lock.withLock {
@@ -68,7 +68,7 @@ internal class ConditionLock(
     }
 
     /**
-     * Запуск ожидания до тех пор, пока [ConditionLock.value] не станет равным [value].
+     * Start waiting until [ConditionLock.value] equals [value].
      */
     fun await(value: Boolean) {
         lock.withLock {
@@ -79,8 +79,8 @@ internal class ConditionLock(
     }
 
     /**
-     * Запуск ожидания до тех пор, пока [value] не станет равным [value] с таймаутом.
-     * @return true, если дождались. false, если не дождались (достигли [timeoutMs])
+     * Start waiting until [value] equals [value] with a timeout.
+     * @return true if waited. false if not waited (reached [timeoutMs])
      */
     fun await(value: Boolean, timeoutMs: Long): Boolean {
         if (timeoutMs <= 0) {

@@ -26,7 +26,7 @@ package com.vk.knet.core.http.body.request
 import java.nio.charset.Charset
 
 /**
- * Реализация [HttpRequestBody], отправляющая в body запроса обычный текст
+ * An implementation of [HttpRequestBody] that sends plain text to the request body
  */
 class HttpRequestBodyContent(
     val content: String

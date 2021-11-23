@@ -25,9 +25,6 @@ package com.vk.knet.core.exceptions
 
 import java.io.IOException
 
-/**
- * Ошибка редиректов
- */
 class HttpRedirectException : IOException {
 
     constructor() : super()

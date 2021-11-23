@@ -27,7 +27,7 @@ import com.vk.knet.core.KnetEngine
 import com.vk.knet.core.utils.ByteArrayPool
 
 /**
- * Фабрика, создающая [HttpPipeline] для указанного списка [HttpInterceptor]
+ * Factory for [HttpPipeline]. Intended to use with [HttpInterceptor] chain.
  */
 @Suppress("CanBeParameter", "FoldInitializerAndIfToElvis")
 object HttpPipelineFactory {

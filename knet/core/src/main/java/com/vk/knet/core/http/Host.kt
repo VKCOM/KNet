@@ -24,7 +24,7 @@
 package com.vk.knet.core.http
 
 /**
- * Мета-информация о хостах, которые точно должны поддерживать QUIC.
+ * Meta information about hosts that should definitely support QUIC.
  */
 data class Host(
     val host: String,

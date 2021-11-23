@@ -24,9 +24,9 @@
 package com.vk.knet.cornet.backoff
 
 /**
- * Генерирует экспоненциальную последовательность чисел с остатком
- * @param init начальное значение последовательности
- * @param sum сумма чисел последовательности
+ * Generates an exponential sequence of numbers with remainder
+ * @param init initial value of the sequence
+ * @param sum sum of sequence numbers
  * @example:
  * 2 and 30 and 2 -> 2 4 8 16 done
  * 2 and 29 and 2 -> 2 4 8 15 done

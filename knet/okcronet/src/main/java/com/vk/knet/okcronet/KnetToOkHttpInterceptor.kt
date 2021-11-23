@@ -41,13 +41,13 @@ class KnetToOkHttpInterceptor(
             return null
         }
 
-        // Преобразуем URL в строку
+        // Mapping HttpUrl to String
         val httpRequest = request.toKnetRequest() ?: return null
 
-        // Выполняем запрос
+        // Execute request
         val response = client.execute(httpRequest)
 
-        // Маппим HttpResponse в Response
+        // Mapping HttpResponse to OkHttp Response
         return response.toOkResponse(request)
     }
 

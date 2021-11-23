@@ -77,8 +77,8 @@ class CronetLog(
     override val maxSize = config.maxSize
 
     /**
-     * Включение записи детальных логов всех сетевых запросов в директорию.
-     * @return Файл/папка, куда будет производиться запись. Если null, то запись логов не поддерживается
+     * Enable writing detailed logs of all network requests to the directory.
+     * @return File / folder to write to. If null, then logging is not supported
      */
     @WorkerThread
     @GuardedBy("lock")
@@ -103,8 +103,8 @@ class CronetLog(
     }
 
     /**
-     * Отключение записи детальных логов всех сетевых запросов
-     * @return Файл/папка, куда были произведена запись. null, если записи логов не была ранее запущена
+     * Disable recording of detailed logs of all network requests
+     * @return The file / folder where the recording was made. null if logging was not previously started
      */
     @WorkerThread
     @GuardedBy("lock")
@@ -122,9 +122,9 @@ class CronetLog(
 
 
     /**
-     * Удаление предыдущей записи детальных логов.
-     * Если функция вызвана после [start], но перед [stop] (в процессе записи),
-     * то логи очистятся, но запись после этого возобновится.
+     * Deleting the previous record of detailed logs.
+     * If the function is called after [start], but before [stop] (during recording),
+     * then the logs will be cleared, but recording will resume after that.
      */
     @WorkerThread
     @GuardedBy("lock")

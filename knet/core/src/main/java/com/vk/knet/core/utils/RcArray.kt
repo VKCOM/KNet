@@ -26,12 +26,14 @@ package com.vk.knet.core.utils
 import java.lang.IllegalStateException
 
 /**
- * Класс для автоматического ресайклинга, не предназначен для
- * - использования вне библиотки
- * - использования между 2 и более потоками
+ * Reference Counter implementation.
  *
- * Начальное состояние [counter] == 0, чтобы отчистить, необходимо
- * Необходимо сделать один или более retain и такое же количество release
+ * Class for auto recycling, not intended to:
+ * - use outside the library
+ * - use between 2 or more threads
+ *
+ * Initial state [counter] == 0, in order to clean up, you need
+ * one or more retains and the same number of releases must be made
  */
 class RcArray(
     private val pool: ByteArrayPool

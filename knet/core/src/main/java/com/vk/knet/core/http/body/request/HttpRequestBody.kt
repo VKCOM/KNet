@@ -22,29 +22,27 @@
  * SOFTWARE.
 */
 package com.vk.knet.core.http.body.request
-
 /**
- * Базовый интерфейс для описания Body запроса
- */
+* Basic interface for describing the Body of the request
+*/
 interface HttpRequestBody {
 
     companion object {
-        const val DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded; charset=utf-8"
+        const val DEFAULT_CONTENT_TYPE = "application/x-www-form-urlencoded;charset=utf-8"
     }
 
     /**
-     * Header http-запроса для описания body
-     */
+    * Header of http request for body description
+    */
     fun getContentType(): String?
 
     /**
-     * Header http-запроса для описания длины
-     */
+    * Header of http request for length description
+    */
     fun getContentLength(): Int
 
     /**
-     * Содержимое body
-     */
+    * Body content
+    */
     fun getContent(): ByteArray
-
 }

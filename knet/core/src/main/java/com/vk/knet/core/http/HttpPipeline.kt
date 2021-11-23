@@ -29,9 +29,9 @@ import com.vk.knet.core.utils.ByteArrayPool
 interface HttpPipeline {
 
     /**
-     * [HttpRequest], который планируется выполнить.
-     * Может как совпадать с [Env.original], так и отличаться, если оригинальный request
-     * был модифицирован каким-либо из предыдущих Interceptor-ов.
+     * [HttpRequest] to be executed.
+     * May be the same as [Env.original], or different if the original request
+     * has been modified by any of the previous Interceptors.
      */
     val request: HttpRequest
 
@@ -41,7 +41,7 @@ interface HttpPipeline {
     val env: Env
 
     /**
-     * Передает операцию исполнения запроса следующему [HttpInterceptor] в цепочке.
+     * Sends a request execution operation to the next [HttpInterceptor] in the chain.
      */
     fun proceed(request: HttpRequest) : HttpResponse
 

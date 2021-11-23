@@ -28,7 +28,7 @@ import com.vk.knet.cornet.CronetHttpLogger
 import java.util.concurrent.Semaphore
 
 /**
- * Управляет возможностью допуска запроса к исполнению согласно лимитам
+ * Controls the ability to admit a request to execution according to limits
  */
 internal class RequestSemaphore(
     maxConcurrentRequests: Int,
@@ -36,12 +36,12 @@ internal class RequestSemaphore(
 ) {
 
     /**
-     * Семафор на общее количество запросов
+     * Semaphore for the total number of requests
      */
     private val overallSemaphore = Semaphore(maxConcurrentRequests)
 
     /**
-     * Семафоры на запросы к определенному хосту
+     * Semaphores for requests to a specific host
      */
     @GuardedBy("this")
     private val hostsSemaphore = mutableMapOf<String, Semaphore>()
@@ -59,7 +59,7 @@ internal class RequestSemaphore(
                 CronetLogger.debug(CronetHttpLogger.DebugType.CLIENT_QUEUE, "[cronet] Common queue | availablePermits - ${availablePermits()} | queueLength $queueLength")
             }
         } catch (e: Throwable) {
-            // Если произошла ошибка при взятии потока, необходимо осободить предыдущий Semaphore
+            // If an error occurred while taking a stream, you need to separate the previous Semaphore
             getHostSemaphore(host).release()
         }
     }

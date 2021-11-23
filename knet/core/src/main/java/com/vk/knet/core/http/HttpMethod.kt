@@ -44,7 +44,7 @@ enum class HttpMethod(
 
     companion object {
         /**
-         * Чтобы каждый раз не проходится по values уменьшаем поиск с O(n) -> O(1)
+         * To avoid going through values each time, reduce the search from O (n) -> O (1)
          */
         private val methodMap = HashMap<String, HttpMethod>()
             .apply {

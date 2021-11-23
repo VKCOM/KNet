@@ -42,7 +42,7 @@ import java.net.UnknownHostException
 import java.util.*
 
 /**
- * Добавление HttpHeaders в запрос
+ * Adding encoding HttpHeaders to Request
  */
 internal fun UrlRequest.Builder.addHeaders(headers: Map<String, List<String>>): UrlRequest.Builder {
     if (headers.isNotEmpty()) {
@@ -131,7 +131,7 @@ internal fun toIntervals(metrics: RequestFinishedInfo.Metrics): HttpMetricInterv
 }
 
 /**
- * Конвертация названия протокола в [HttpProtocol]
+ * Convert Protocol Name to [HttpProtocol]
  */
 internal fun String.toHttpProtocol(): HttpProtocol {
     return when {
@@ -146,7 +146,7 @@ internal fun String.toHttpProtocol(): HttpProtocol {
 }
 
 /**
- * Cronet маскирует все ошибки в свой формат, но в плане универсальности нам нужны общепринятые Exception.
+ * Cronet masks all errors in its own format, but in terms of versatility, we need generally accepted Exceptions.
  */
 internal fun CronetException.toNormalJavaException(): Throwable {
     val th = when (this) {
@@ -178,7 +178,7 @@ internal fun CronetException.toNormalJavaException(): Throwable {
         else -> IOException(this)
     }
     if (th.cause != this) {
-        // Не у всех Exception можно указать cause, потому добавляем их как suppressed
+        // Not all Exceptions can have a cause, so we add them as suppressed
         th.addSuppressedSafe(this)
     }
     return th

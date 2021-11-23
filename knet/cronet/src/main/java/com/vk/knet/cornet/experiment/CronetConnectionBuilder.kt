@@ -52,14 +52,14 @@ class CronetConnectionBuilder(
         callback: UrlRequest.Callback,
         provider: UploadDataProvider?
     ): UrlRequest {
-        // тк все метрики внутри cornet в абсолютных значениях времени прописываем свое
+        // since all metrics inside cornet in absolute values of time we write our own
         val requestInitTime = SystemClock.elapsedRealtime()
         val requestInitTimestamp = System.currentTimeMillis()
 
-        // Callback, вызываемый когда запрос заканчивает свою работу (неважно по какой причине)
+        // Callback, called when the request finishes its work (no matter what the reason)
         val requestCompleteHandler = object : RequestFinishedInfo.Listener(executorMetric) {
             override fun onRequestFinished(requestInfo: RequestFinishedInfo) {
-                // Раскидываем событие об HttpMetrics
+                // Scattering an event about HttpMetrics
                 if (metric != null) {
                     val info = requestInfo.responseInfo
                     if (info == null) {
@@ -88,7 +88,7 @@ class CronetConnectionBuilder(
         }
 
 
-        // Формируем urlRequest, используемый Cronet для запуска запроса
+        // Form the urlRequest used by Cronet to launch the request
         return engine
             .newUrlRequestBuilder(request.url, callback, executor)
             .disableCache()

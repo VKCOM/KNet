@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * Искапсуляция асинхронного выполнения запросов
- * т.к. количество потоков [ExecutorService] привязано к макимальному количеству одновременных запросов
+ * Eliminate asynchronous request execution
+ * since the number of [ExecutorService] threads is tied to the maximum number of concurrent requests
  */
 class CronetDispatcher(
     maxRequests: Int,

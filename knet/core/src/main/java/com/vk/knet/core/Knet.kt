@@ -45,8 +45,8 @@ class Knet(
     }
 
     /**
-     * Отправка запроса на выполнение.
-     * Все запросы являются блокирующими, потому вызывающий поток будет ожидать завершения запроса.
+     * Queuing request.
+     * All Knet request is blocking. So you have to wait execution.
      */
     @WorkerThread
     fun execute(request: HttpRequest): HttpResponse {
@@ -55,7 +55,7 @@ class Knet(
     }
 
     /**
-     * Завершение работы. Все выполняющиеся запросы будут прерваны
+     * All of current requests would be canceled or removed from queue.
      */
     @AnyThread
     fun shutdown() {

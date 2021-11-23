@@ -26,7 +26,7 @@ package com.vk.knet.core.exceptions
 import java.io.IOException
 
 /**
- * Сетевая ошибка, связанная с отстутсвием сети
+ * Network error due to lack of network
  */
 class NoNetworkException : IOException {
 

@@ -24,9 +24,9 @@
 package com.vk.knet.core.http
 
 /**
- * Утилита, позволяющая модифицировать / слушать запросы и ответы сервера.
- * По сути, обычная реализация pipeline-паттерна.
- * Самым последним элементом в цепочке [HttpInterceptor] является тот, который реально выполняет запрос.
+ * A utility that allows you to modify / listen to server requests and responses.
+ * In fact, a normal implementation of the pipeline pattern.
+ * The very last item in the [HttpInterceptor] chain is the one that actually makes the request.
  */
 fun interface HttpInterceptor {
     fun intercept(pipeline: HttpPipeline): HttpResponse

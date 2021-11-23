@@ -23,10 +23,7 @@
 */
 package com.vk.knet.core.utils
 
-/**
- * Простая утилита, хранищая какая-то значение.
- * Обычно нужно, чтобы шарить mutable value между потоками
- */
+@Deprecated("Please don't use this staff")
 class ValueHolder<T>(
     @Volatile var value: T?
 )

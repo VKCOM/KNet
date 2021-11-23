@@ -24,6 +24,6 @@
 package com.vk.knet.core.exceptions
 
 /**
- * Простой Exception, который просто служит хранителем stacktrace вызовов
+ * A simple Exception that just serves as the stacktrace of the calls
  */
 class CauseException(cause: Throwable? = null) : Exception(cause)

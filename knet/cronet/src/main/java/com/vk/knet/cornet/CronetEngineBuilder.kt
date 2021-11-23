@@ -158,9 +158,9 @@ class CronetEngineBuilder(
     fun withQuic(options: CronetQuic) = apply { this.quicOptions = options }
 
     /**
-     * Если сервер не получает от бэка ответ по UDP за 4 секнуды QUIC хост помечается как broken.
-     * При отметке хостка как broken, проставляется expiration, запрещающий его использование.
-     * Expiration рабоатет в виде Backoff, начинается с 300 sec до 300 * 2 ^ broken_count ~ 42 hours
+     * If the server does not receive a UDP response from the back in 4 seconds, the QUIC host is marked as broken.
+     * When a host is marked as broken, an expiration is set, prohibiting its use.
+     * Expiration works as Backoff, starts from 300 sec to 300 * 2 ^ broken_count ~ 42 hours
      */
     fun withClearBroken(isClear: Boolean) = apply {
         this.isClearBroken = isClear

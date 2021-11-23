@@ -31,14 +31,14 @@ import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.withLock
 
 /**
- * Это - очень замечательный класс-костыль, позволяющий связать callback-архитектуру Cronet и [InputStream].
+ * This is a very cool crutch class that allows you to link the Cronet callback architecture to [InputStream].
  *
- * Общий принцип, же, в целом, простой.
- * 1) Ловим все вызовы на read* и читаем из промежуточного [buffer] (который отдает Cronet)
- * 2) Если [buffer] уже успели прочитать, то запрашиваем новый буфер через [Delegate.onRead].
- *    В этом случае будет дозапрос данных из сети, потому эти функции вполне могут кидать Exception.
- *    Вся логика по отлову timeouts делегирована byteBufferProvider.
- * 3) И так до тех пор, пока не достигнем состояния [BUFFER_STATE_FINISHED]
+ * The general principle is, on the whole, simple.
+ * 1) We catch all calls to read * and read from the intermediate [buffer] (which is given by Cronet)
+ * 2) If [buffer] has already been read, then we request a new buffer via [Delegate.onRead].
+ * In this case, there will be an additional request for data from the network, so these functions may well throw Exception.
+ * All logic for catching timeouts is delegated to byteBufferProvider.
+ * 3) And so on until we reach the state [BUFFER_STATE_FINISHED]
  */
 internal class BodyInputStream(
     private val delegate: Delegate
@@ -53,28 +53,28 @@ internal class BodyInputStream(
     companion object {
 
         /**
-         * [InputStream] находится в состоянии ожидания обновленных значений [buffer].
-         * Из этого состояния можно перейти как в [BUFFER_STATE_SET], так и в [BUFFER_STATE_FINISHED].
+         * [InputStream] is waiting for updated values [buffer].
+         * From this state, you can go to both [BUFFER_STATE_SET] and [BUFFER_STATE_FINISHED].
          */
         private const val BUFFER_STATE_AWAIT = 1
 
         /**
-         * Индикация состояния, что установлен свежий [buffer] и [InputStream] может читать данные из него.
-         * Когда он прочтет весь буфер, то состояние [bufferState] перейдет в [BUFFER_STATE_AWAIT].
+         * Status indication that fresh [buffer] is set and [InputStream] can read data from it.
+         * When it has read the entire buffer, the [bufferState] state will transition to [BUFFER_STATE_AWAIT].
          */
         private const val BUFFER_STATE_SET = 2
 
         /**
-         * Индикация состояния, что новых данных в [buffer] не будет, ибо сервер уже отдал все нужные данные.
-         * В таком случае любая read* операция из [InputStream] должна отдать -1 (согласно его контракту).
+         * Status indication that there will be no new data in [buffer], because the server has already given all the necessary data.
+         * In this case, any read * operation from [InputStream] must return -1 (according to its contract).
          */
         private const val BUFFER_STATE_FINISHED = 3
 
         /**
-         * Индикация состояния, что новых данных в [buffer] не будет, по причине того, что [BodyInputStream]
-         * был закрыт.
+         * Indication of the state that there will be no new data in [buffer], due to the fact that [BodyInputStream]
+         * was closed.
          *
-         * В таком случае любая read* операция из [InputStream] должна отдать -1 (согласно его контракту).
+         * In this case, any read * operation from [InputStream] must return -1 (according to its contract).
          */
         private const val BUFFER_STATE_CLOSED = 4
 
@@ -92,9 +92,9 @@ internal class BodyInputStream(
     private var bufferState = BUFFER_STATE_AWAIT
 
     /**
-     * Обертка над read* операциями из [InputStream].
-     * Вызывает [bufferQueueReader], который уже осуществляют всю магию.
-     * Здесь же просто обрабатываем ошибку
+     * Wrapper over read * operations from [InputStream].
+     * Calls [bufferQueueReader], which already does all the magic.
+     * Here we just handle the error
      */
     private inline fun bufferQueue(crossinline readFun: (ByteBuffer) -> Int): Int {
         try {
@@ -106,15 +106,15 @@ internal class BodyInputStream(
     }
 
     /**
-     * Обертка над read* операциями из [InputStream].
-     * Реализует всю магию по смене [bufferState] и наблюдению за [buffer].
-     * Реализация сделана на основе цикла, а не рекурсии, ибо чревато StackOverflow.
+     *  Wrapper over read * operations from [InputStream].
+     * Implements all the magic of changing [bufferState] and watching [buffer].
+     * The implementation is made on the basis of a loop, not recursion, because StackOverflow is fraught.
      */
     private inline fun bufferQueueReader(readFun: (ByteBuffer) -> Int): Int {
         lock.withLock {
             while (true) {
-                // Новых буферов не предвидится, так как сервер уже вернул все данные.
-                // В таком случае, просто возвращаем -1.
+                // No new buffers are expected because the server has already returned all the data.
+                // In this case, just return -1.
                 if (bufferState >= BUFFER_STATE_FINISHED) {
                     return -1
                 }
@@ -124,16 +124,16 @@ internal class BodyInputStream(
                     return -1
                 }
 
-                // Буфер пока не готов (либо мы уже вычитали весь старый). Запрашиваем новые данные
+                // The buffer is not ready yet (or we have already subtracted all the old one). Requesting new data
                 if (bufferState == BUFFER_STATE_AWAIT) {
                     buffer = delegate.onRead()
                     bufferState = if (buffer == null) BUFFER_STATE_FINISHED else BUFFER_STATE_SET
                     continue
                 }
 
-                // Буфер готов, можно использовать его для чтения
-                // Если операции чтения станут возвращать -1, значит мы прочитали буфер до конца.
-                // В таком случае надо запросить новый.
+                // The buffer is ready, you can use it for reading
+                // If read operations start returning -1, then we have read the buffer to the end.
+                // In this case, you need to request a new one.
                 if (bufferState == BUFFER_STATE_SET) {
                     val safeBuffer = buffer
                         ?: throw IllegalStateException("Buffer can't be null with state - $bufferState!")
@@ -150,7 +150,7 @@ internal class BodyInputStream(
     }
 
     /**
-     * Реализация [read] метода из [InputStream]. Является обязательным методом для переопределения.
+     * Implementation of the [read] method from [InputStream]. Required to override.
      */
     override fun read(): Int {
         return bufferQueue { byteBuffer ->
@@ -163,8 +163,8 @@ internal class BodyInputStream(
     }
 
     /**
-     * Реализация [read] метода из [InputStream]. Переопределять её не обязательно.
-     * Тем не менее мы это делаем, чтобы эффективнее читать сразу набор байт.
+     * Implementation of the [read] method from [InputStream]. It is not necessary to override it.
+     * Nevertheless, we do this in order to more efficiently read a set of bytes at once.
      */
     override fun read(b: ByteArray, off: Int, len: Int): Int {
         return bufferQueue { byteBuffer ->

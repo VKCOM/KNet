@@ -24,13 +24,13 @@
 package com.vk.knet.cornet.config
 
 /**
- * @param connectTimeoutMs Таймаут на установление соединения
- * @param readTimeoutMs Таймаут на чтение данных от сервера
- * @param writeTimeoutMs Таймаут на запись данных в сокет
- * @param maxConcurrentRequests Количество возможных одновременных запросов к сети
- * @param maxConcurrentRequestsPerHost Количество возможных одновременных запросов к одному хосту
- * @param followRedirects Флаг разрешенности редиректов
- * @param followSslRedirects Флаг разрешенности редиректов между http и https
+ * @param connectTimeoutMs Connection timeout
+ * @param readTimeoutMs Timeout for reading data from the server
+ * @param writeTimeoutMs Timeout for writing data to the socket
+ * @param maxConcurrentRequests Number of possible concurrent network requests
+ * @param maxConcurrentRequestsPerHost Number of possible concurrent requests to one host
+ * @param followRedirects Redirect permission flag
+ * @param followSslRedirects Flag to allow redirects between http and https
  */
 data class CronetCoreConfig(
     val quicConfig: CronetQuic?,

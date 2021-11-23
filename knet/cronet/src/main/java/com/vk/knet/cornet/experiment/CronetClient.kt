@@ -57,19 +57,19 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Реализация сетевого слоя с помощью библиотеки Cronet:
+ *  Implementation of the network layer using the Cronet library:
  * https://developer.android.com/guide/topics/connectivity/cronet
  * https://chromium.googlesource.com/chromium/src/+/master/components/cronet/README.md
  * https://chromium.googlesource.com/chromium/src/+/master/components/cronet/android/
  *
- * Общая информация:
+ * General information:
  * - https://blog.cloudflare.com/the-road-to-quic/
  * - https://eng.uber.com/employing-quic-protocol/
  *
- * Можно немного подглянуть в реализацию в ExoPlayer (нам не очень подходит):
+ * You can peek a little at the implementation in ExoPlayer (not very suitable for us):
  * https://github.com/google/ExoPlayer/tree/release-v2/extensions/cronet/src/main/java/com/google/android/exoplayer2/ext/cronet
  *
- * Есть ещё реализация как Interceptor для OkHttp (нам не очень подходит):
+ * There is also an implementation as an Interceptor for OkHttp (not very suitable for us):
  * https://github.com/akshetpandey/react-native-cronet/tree/master/android/src/main/java/com/akshetpandey/rncronet
  */
 class CronetClient(
@@ -91,8 +91,8 @@ class CronetClient(
     private val executorPool = CronetExecutorsPool(config.maxConcurrentRequests)
 
     /**
-     * Отправка запроса на выполнение.
-     * Все запросы являются блокирующими, потому вызывающий поток будет ожидать завершения запроса.
+     * Sending a request for execution.
+     * All requests are blocking, so the calling thread will wait for the request to complete.
      */
     @WorkerThread
     fun execute(request: HttpRequest): HttpResponse {
@@ -105,7 +105,7 @@ class CronetClient(
     }
 
     /**
-     * Обертка над запросом к сети. Больше нужен для обработки каких-либо ошибок
+     * Wrapper over a network request. More needed to handle any errors
      */
     private fun launchRequestAndAwait(request: HttpRequest): HttpResponse {
         try {
@@ -125,9 +125,9 @@ class CronetClient(
     }
 
     /**
-     * Непосредственная реализация запроса к сети.
-     * Внимание! Этот класс полон лямб и прочей шляпы, так как иначе завернуть callback-архитектуру Cronet
-     * в обычный синхронный запрос и InputStream нельзя (либо я не придумал нормального способа).
+     * Direct implementation of the network request.
+     * Attention! This class is full of lamb and other hats, since otherwise it would wrap the Cronet callback architecture
+     * in a normal synchronous request and InputStream is impossible (or I have not come up with a normal way).
      */
     @WorkerThread
     private fun launchRequestAndAwaitImpl(request: HttpRequest): HttpResponse {
@@ -138,7 +138,7 @@ class CronetClient(
     private val builder = CronetConnectionBuilder(engine, metric)
 
     private fun executeRequest(request: HttpRequest): HttpResponse {
-        // Native buffer передается в Cronet и используется для чтения из inputStream
+        // Native buffer is passed to Cronet and used to read from inputStream
         val arcBuffer = pools.native.arc()
         val executor = executorPool.obtain()
 
@@ -157,7 +157,7 @@ class CronetClient(
         try {
             cronetController.setupSession(request, executor)
         } catch (e: Throwable) {
-            // Освобождаем Semaphore доступа к хосту сами, т.к. onRequestFinished пока не вызовется
+            // Release the Semaphore access to the host ourselves, since onRequestFinished is not called yet
             CronetLogger.error(TAG, "[cronet] Error while create request ${request.url}!")
             executorPool.recycle(executor)
             throw e
@@ -167,7 +167,7 @@ class CronetClient(
         try {
             startSession(request, cronetController)
         } catch (e: Throwable) {
-            // Освобождаем Semaphore доступа к хосту сами, т.к. onRequestFinished пока не вызовется
+            // Release the Semaphore access to the host ourselves, since onRequestFinished is not called yet
             CronetLogger.error(TAG, "[cronet] Error while start session ${request.url}!")
             closeSession(request, executor)
             throw e
@@ -177,7 +177,7 @@ class CronetClient(
         try {
             val startConnectionTime = System.currentTimeMillis()
             cronetController.startConnection()
-            arcBuffer.retain() // Если был вызвн startConnection, обязательно в итоге вызовется onTerminate
+            arcBuffer.retain() // If startConnection was called, onTerminate will be called eventually
             cronetController.awaitConnection(request, config.connectTimeoutMs)
             val endConnectionTime = System.currentTimeMillis()
             CronetLogger.debug(
@@ -185,7 +185,7 @@ class CronetClient(
                 "[cronet] Connection time  ${endConnectionTime - startConnectionTime} ms to ${request.url}"
             )
         } catch (error: Throwable) {
-            // Освобождаем Semaphore доступа к хосту сами, т.к. onRequestFinished пока не вызовется
+            // Release the Semaphore access to the host ourselves, since onRequestFinished is not called yet
             CronetLogger.error(TAG, "[cronet] Error while await of ${request.url} connection!")
             cronetController.closeConnection()
             throw error
@@ -193,17 +193,17 @@ class CronetClient(
 
         // Read/Write
         try {
-            // Важно! В результате мы получим базовый ответ сервера (статус, headers и т.д.)
-            // После чего можем это обернуть в понятные нам [HttpResponse] и [InputStream] (для body)
+            // Important! As a result, we will receive the basic server response (status, headers, etc.)
+            // Then we can wrap it in [HttpResponse] and [InputStream] (for the body) that are clear to us
             val urlResponseInfo = cronetController.awaitResponse()
 
-            // ArrayBuffer с Reference Count
+            // ArrayBuffer with Reference Count
             val buffer = arcBuffer.retain()
 
-            // Обертка над body ответа. Позволяет перевести callback-архитектуру Cronet в InputStream
-            // Все данные body читаются лениво и 'by demand'.
-            // Важно помнить, что в процессе чтения могут возникнуть ошибки (например, таймауты),
-            // потому их следует ловить и отменять запрос самостоятельно
+            // Wrapper over the response body. Allows to translate Cronet callback architecture into InputStream
+            // All body data is read lazily and 'by demand'.
+            // It is important to remember that during the reading process, errors may occur (for example, timeouts),
+            // so you should catch them and cancel the request yourself
             val responseInputStream = BodyInputStream(
                 delegate = object : BodyInputStream.Delegate {
                     override fun onError(error: Throwable) {
@@ -225,7 +225,7 @@ class CronetClient(
             val contentType = headers.getHeader("Content-Type")
             val contentLength = headers.getHeader("Content-Length")?.toLongOrNull()
 
-            // Получили ответ от сервера, формируем его в более понятный нам вид
+            // Received a response from the server, we form it in a more understandable form for us
             return HttpResponse(
                 protocol = urlResponseInfo.negotiatedProtocol.toHttpProtocol(),
                 url = urlResponseInfo.url,
@@ -249,9 +249,9 @@ class CronetClient(
     private fun startSession(request: HttpRequest, connection: RequestController) {
         onRequestBegin(request.id, connection)
 
-        // Пытаемся получить доступ на выполнение запросов через Semaphore
-        // Не забываем потом в onComplete освободить его (через try/finally сделать нерельно)
-        // Вызов close необзателен, т.к. в случае ошкбки startAsyncSession сам закроет все семафоры
+        // Trying to get access to execute requests through Semaphore
+        // Do not forget to release it later in onComplete (it is not practical to do it through try / finally)
+        // Calling close is optional, because in case of error startAsyncSession will close all semaphores by itself
         try {
             dispatcher.startAsyncSession(request.uri)
         } catch (e: InterruptedException) {
@@ -265,17 +265,17 @@ class CronetClient(
 
     private fun closeSession(request: HttpRequest, executor: CronetExecutor) {
         if (onRequestComplete(request.id)) {
-            // ВАЖНО! Вызывать не больше 1 раза!
-            // Оповещаем о завершении запроса
+            // IMPORTANT! Call no more than 1 time!
+            // Notify about the completion of the request
             dispatcher.closeAsyncSession(request.uri)
 
-            // Освобождаем Semaphore доступа к хосту
+            // Free up the Semaphore access to the host
             executorPool.recycle(executor)
         }
     }
 
     /**
-     * Завершение работы. Все выполняющиеся запросы будут прерваны
+     * Completion of work. All running requests will be aborted
      */
     @AnyThread
     fun shutdown() {

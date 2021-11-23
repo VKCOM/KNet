@@ -27,7 +27,7 @@ import com.vk.knet.core.http.HttpRequest
 import com.vk.knet.core.http.HttpResponse
 
 /**
- * Подписчик на события сбора метрик
+ * Subscriber to metric collection events
  */
 fun interface HttpMetricsListener {
     fun onMetricsCollected(

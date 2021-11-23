@@ -48,10 +48,10 @@ interface OkHttpToKnetAdapter {
     fun Request.toKnetRequest(): HttpRequest? {
         val request = this
 
-        // Преобразуем URL в строку
+        // Mapping HttpUrl to String
         val url = request.url.toString()
 
-        // Маппим Request в HttpRequest
+        // Mapping Request to HttpRequest
         val method = HttpMethod.from(request.method) ?: return null
         val requestBody = request.body
         val contentType = requestBody?.contentType()
@@ -74,7 +74,7 @@ interface OkHttpToKnetAdapter {
     }
 
     /**
-     * Преобразуем OkHttp [RequestBody] в Executor [HttpRequestBody]
+     * Mapping OkHttp [RequestBody] to KNet [HttpRequestBody]
      */
     private fun RequestBody?.toKnetBody(): HttpRequestBody? {
         val requestBody = this  ?: return null

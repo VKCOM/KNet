@@ -124,7 +124,7 @@ class RequestController(
     ) {
         val backoffAwait = BackoffExponentSum(BACKOFF_INIT, timeoutMs)
 
-        // Ждем установления соединения
+        // Wait for the connection to be established
         do {
             val time = backoffAwait.next()
 
@@ -136,7 +136,7 @@ class RequestController(
 
             connection?.let { connect ->
                 if (connect.isDone) {
-                    // Если запрос уже завершен, отменяем его и ждем вызов коллбека
+                    // If the request has already been completed, cancel it and wait for the callback call
                     CronetLogger.debug(CronetHttpLogger.DebugType.CLIENT_TIMEOUTS, "[cronet] Url ${request.url} is already done!")
                 }
             }
@@ -285,8 +285,8 @@ class RequestController(
     }
 
     /**
-     * Создание [UploadDataProvider] для отправки данных на сервер из указанного [HttpRequest].
-     * @return [UploadDataProvider] или null, если он не указан в запросе
+     * Create [UploadDataProvider] to send data to server from specified [HttpRequest].
+     * @return [UploadDataProvider] or null if not specified in the request
      */
     private fun createUploadDataProvider(request: HttpRequest): UploadDataProvider? {
         val requestMethod = request.method
@@ -301,8 +301,8 @@ class RequestController(
     }
 
     /**
-     * Утилита для наблюдения вызовов из [UploadDataProvider].
-     * Нужен для определения таймаутов на запись
+     * Utility for observing calls from [UploadDataProvider].
+     * Needed to define write timeouts
      */
     @CronetThread
     private inner class UploadDelegate(
@@ -333,20 +333,20 @@ class RequestController(
     }
 
     /**
-     * Callback, осуществляющий чтение запроса.
+     * Callback that reads the request.
      * https://chromium.googlesource.com/chromium/src/+/master/components/cronet/README.md
      *
-     * Сам Cronet, на мой взгляд, местами сделан немного дебильно. Зачем делать callback-архитектуру,
-     * когда в Java уже есть всем понятный и широкоподдерживаемый [InputStream] для чтения ответа сервера.
-     * В реалиях обычных приложений нужен [InputStream], так как на его основе работают многие тулзы/библиотеки.
-     * В итоге, с помощью [BodyInputStream] сделан мини-костыль, позволяющий возвращать ответ в виде [InputStream].
+     * Cronet itself, in my opinion, is made a little stupid in some places. Why do callback architecture,
+     * when Java already has an understandable and widely supported [InputStream] for reading the server response.
+     * In the realities of ordinary applications, you need [InputStream], since many tools / libraries work on its basis.
+     * As a result, with the help of [BodyInputStream], a mini-crutch was made that allows you to return a response in the form of [InputStream].
      *
-     * Аналогично, в Cronet нет возможности выставить timeout для запросов.
-     * Поэтому мы вынуждены на [onResponseStarted], [onReadCompleted], и т.д. оповещать вызывающий поток.
-     * На основе этого он может понять, есть какая-либо активность или нет, т.е. управлять timeout.
+     * Similarly, there is no way to set timeout for requests in Cronet.
+     * Therefore, we are forced to [onResponseStarted], [onReadCompleted], etc. notify the calling thread.
+     * Based on this, he can understand whether there is any activity or not, i.e. manage timeout.
      *
-     * Все callback и все функции вызываются на потоке, независимом от потока, который сделал запрос.
-     * Потому надо помнить о корректном прокидывании ошибок в вызывающий поток (по большей части, через [InputStream]).
+     * All callbacks and all functions are called on a thread independent of the thread that made the request.
+     * Therefore, you need to remember about correctly throwing errors into the calling stream (for the most part, via [InputStream]).
      */
     @CronetThread
     private inner class CallbackDelegate(
@@ -355,10 +355,10 @@ class RequestController(
     ) : UrlRequest.Callback() {
 
         /**
-         * Callback cronet о получении redirect. Просто следуем по редиректам дальше.
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
+         * Callback cronet about receiving redirect. Just follow the redirects further.
+         * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
          *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
+         * This method should ONLY be called by Cronet, we cannot touch it.
          */
         @CronetThread
         override fun onRedirectReceived(request: UrlRequest, info: UrlResponseInfo, newLocationUrl: String) {
@@ -371,14 +371,14 @@ class RequestController(
         }
 
         /**
-         * Callback cronet о получении ответа (статус соединения, заголовки и прочее).
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
-         * Само тело ответа не читается, мы должны вычитать его сами позднее с помощью [BodyInputStream],
-         * который неявно будет дергать [onReadCompleted], [onSucceeded] и т.д. через [awaitChunk].
-         * Сам же результат записывается в [responseInfo], который нужен в [awaitResponseInfo]
-         *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
-         */
+        * Callback cronet about receiving a response (connection status, headers, etc.).
+        * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
+        * The body of the response itself is not readable, we must subtract it ourselves later using [BodyInputStream],
+        * which will implicitly yank [onReadCompleted], [onSucceeded], etc. via [awaitChunk].
+        * The result itself is written to [responseInfo], which is needed in [awaitResponseInfo]
+        *
+        * This method should ONLY be called by Cronet, we cannot touch it.
+        */
         @CronetThread
         override fun onResponseStarted(request: UrlRequest, info: UrlResponseInfo) {
             CronetLogger.debug(CronetHttpLogger.DebugType.CLIENT_CALLBACK, "[cronet] Request callback of ${httpRequest.url} started!")
@@ -388,11 +388,11 @@ class RequestController(
         }
 
         /**
-         * Callback cronet о получении chunk ответа.
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
-         * Используется в [awaitChunk].
+         * Callback cronet to receive a chunk response.
+         * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
+         * Used in [awaitChunk].
          *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
+         * This method should ONLY be called by Cronet, we cannot touch it.
          */
         @CronetThread
         override fun onReadCompleted(request: UrlRequest, info: UrlResponseInfo, buffer: ByteBuffer) {
@@ -401,11 +401,11 @@ class RequestController(
         }
 
         /**
-         * Callback cronet о завершнии запроса (сервер отдал все данные и весь body).
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
-         * Используется в [awaitChunk].
+         * Callback cronet about the completion of the request (the server gave all the data and the entire body).
+         * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
+         * Used in [awaitChunk].
          *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
+         * This method should ONLY be called by Cronet, we cannot touch it.
          */
         @CronetThread
         override fun onSucceeded(request: UrlRequest, info: UrlResponseInfo?) {
@@ -416,11 +416,11 @@ class RequestController(
         }
 
         /**
-         * Callback cronet о завершнии запроса (произошла какая-то ошибка).
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
-         * Используется в [awaitChunk].
+         * Callback cronet about the completion of the request (some kind of error occurred).
+         * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
+         * Used in [awaitChunk].
          *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
+         * This method should ONLY be called by Cronet, we cannot touch it.
          */
         @CronetThread
         override fun onFailed(request: UrlRequest?, info: UrlResponseInfo?, err: CronetException) {
@@ -438,11 +438,11 @@ class RequestController(
         }
 
         /**
-         * Callback cronet о завершнии запроса (из-за ручного вызова cancel на UrlRequest).
-         * Вызывается на [Executor], указанном при создании [request] ([CronetEngine.newUrlRequestBuilder]].
-         * Используется в [awaitChunk].
+         * Callback cronet about the completion of the request (due to a manual call to cancel on UrlRequest).
+         * Called on the [Executor] specified when creating [request] ([CronetEngine.newUrlRequestBuilder]].
+         * Used in [awaitChunk].
          *
-         * Этот метод должен вызываться ТОЛЬКО Cronet, нам его нельзя трогать.
+         * This method should ONLY be called by Cronet, we cannot touch it.
          */
         @CronetThread
         override fun onCanceled(request: UrlRequest, info: UrlResponseInfo?) {
