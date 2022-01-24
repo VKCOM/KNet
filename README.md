@@ -1,7 +1,7 @@
 ## KNet
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-Android network client based on Cronet. This library let you easily use QUIC protocol in your Android projects.
+Android network client based on Cronet. This library let you easily use HTTP/3 and QUIC protocol in your Android projects.
 You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abstracts/8037) or [product](https://www.highload.ru/spb/2021/abstracts/8035) or [backend](https://www.highload.ru/spb/2021/abstracts/8034)
 
 ### Order:
