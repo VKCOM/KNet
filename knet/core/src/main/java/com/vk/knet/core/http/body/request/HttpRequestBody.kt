@@ -22,6 +22,7 @@
  * SOFTWARE.
 */
 package com.vk.knet.core.http.body.request
+
 /**
 * Basic interface for describing the Body of the request
 */

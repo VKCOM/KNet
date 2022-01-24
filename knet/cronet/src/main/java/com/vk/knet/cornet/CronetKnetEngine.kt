@@ -26,11 +26,12 @@ package com.vk.knet.cornet
 import android.content.Context
 import com.vk.knet.core.KnetEngine
 import com.vk.knet.core.http.*
+import com.vk.knet.cornet.experiment.CronetClient
 
 
 class CronetKnetEngine
 private constructor(
-    private val client: com.vk.knet.cornet.experiment.CronetClient,
+    private val client: CronetClient,
     private val interceptors: List<HttpInterceptor>
 ) : KnetEngine {
 
@@ -62,10 +63,10 @@ private constructor(
     class Builder(
         context: Context,
     ) {
-        private var builder: com.vk.knet.cornet.experiment.CronetClient.Builder = com.vk.knet.cornet.experiment.CronetClient.Builder(context)
+        private var builder: CronetClient.Builder = CronetClient.Builder(context)
         private val interceptors: MutableList<HttpInterceptor> = mutableListOf()
 
-        fun client(apply: com.vk.knet.cornet.experiment.CronetClient.Builder.() -> com.vk.knet.cornet.experiment.CronetClient.Builder) {
+        fun client(apply: CronetClient.Builder.() -> CronetClient.Builder) {
             builder.apply()
         }
 

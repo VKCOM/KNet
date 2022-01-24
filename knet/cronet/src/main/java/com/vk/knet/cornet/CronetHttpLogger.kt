@@ -38,7 +38,7 @@ interface CronetHttpLogger {
 
         companion object {
             val ALL by lazy { values().toSet() }
-            val RELEASE by lazy { setOf(NATIVE_BUFFER, EXEC_POOL) }
+            val RELEASE by lazy { setOf(CLIENT_BUILDER, NATIVE_BUFFER, EXEC_POOL) }
         }
     }
 

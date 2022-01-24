@@ -144,10 +144,13 @@ class CronetEngineBuilder(
 ) {
 
     private var cache: CronetCache? = null
+    private var loader: CronetLibLoader? = null
     private var isClearBroken: Boolean = false
     private var hasHttp2: Boolean = false
     private var hasBrotli: Boolean = false
     private var quicOptions: CronetQuic? = null
+
+    fun withLibLoader(loader: CronetLibLoader?) = apply { this.loader = loader }
 
     fun withCache(cache: CronetCache) = apply { this.cache = cache }
 
@@ -158,9 +161,9 @@ class CronetEngineBuilder(
     fun withQuic(options: CronetQuic) = apply { this.quicOptions = options }
 
     /**
-     * If the server does not receive a UDP response from the back in 4 seconds, the QUIC host is marked as broken.
-     * When a host is marked as broken, an expiration is set, prohibiting its use.
-     * Expiration works as Backoff, starts from 300 sec to 300 * 2 ^ broken_count ~ 42 hours
+     * Если сервер не получает от бэка ответ по UDP за 4 секнуды QUIC хост помечается как broken.
+     * При отметке хостка как broken, проставляется expiration, запрещающий его использование.
+     * Expiration рабоатет в виде Backoff, начинается с 300 sec до 300 * 2 ^ broken_count ~ 42 hours
      */
     fun withClearBroken(isClear: Boolean) = apply {
         this.isClearBroken = isClear
@@ -192,6 +195,14 @@ class CronetEngineBuilder(
                 }
                 is CronetCache.Empty -> {}
             }
+        }
+
+        if (loader != null) {
+            builder.setLibraryLoader(object : CronetEngine.Builder.LibraryLoader() {
+                override fun loadLibrary(lib: String) {
+                    loader?.loadLibrary(lib)
+                }
+            })
         }
 
         builder.enableHttp2(hasHttp2)

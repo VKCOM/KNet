@@ -1,0 +1,1 @@
+-keep class com.vk.knet.cornet.KnetCronetProvider

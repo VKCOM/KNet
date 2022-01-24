@@ -35,9 +35,9 @@ You can see more about QUIC here - [mobile](https://www.highload.ru/spb/2021/abs
 You can try this library using Gradle:
 ``` groovy
 dependencies {
- implementation 'com.vk.knet:core:1.0-alpha05'
- implementation 'com.vk.knet:cronet:1.0-alpha05'
- implementation 'com.vk.knet:okcronet:1.0-alpha05'
+ implementation 'com.vk.knet:core:1.0'
+ implementation 'com.vk.knet:cronet:1.0'
+ implementation 'com.vk.knet:okcronet:1.0'
 }
 ```
 
